@@ -7,7 +7,11 @@ def expandLayout(diskMap: String): String =
     .foldLeft("") { case (acc, (c, idx)) =>
       val idNumber = idx / 2
       val chosenChar = if idx % 2 == 1 then "." else idNumber.toString
-      acc + chosenChar.repeat(c.asDigit)
+      try
+        acc + chosenChar.repeat(c.asDigit)
+      catch {
+        case e => pprintln(e); pprintln(c); ""
+      }
     }
 
 val freeSpaceBeforeFile = raw"\d+(\.)\.*\d+".r
@@ -29,11 +33,18 @@ def moveBlocks(expanded: String): String = {
   }
 }
 
-def part1() = {
-  // val input = Source.fromFile("./examples/day9.txt").mkString
-  val input = "12345"
+def checksum(finalExpansion: String): BigInt =
+  finalExpansion
+    .filter(_.isDigit)
+    .zipWithIndex
+    .map { case (digit, idx) => BigInt(digit.asDigit) * BigInt(idx) }
+    .sum
 
-  val result = moveBlocks(expandLayout(input))
+def part1() = {
+  val input = Source.fromFile("./input/day9.txt").mkString.trim
+  // val input = "12345"
+
+  val result = checksum(moveBlocks(expandLayout(input)))
   // pprintln(moveBlocks(result))
 
   pprintln(result)
